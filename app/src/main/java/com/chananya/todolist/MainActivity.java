@@ -1,25 +1,15 @@
 package com.chananya.todolist;
 
-import android.app.*;
 import android.os.*;
 import android.view.*;
-import android.view.View.*;
-import android.widget.*;
 import android.content.*;
-import android.graphics.*;
-import android.media.*;
-import android.net.*;
-import android.text.*;
-import android.util.*;
-import android.webkit.*;
-import android.animation.*;
-import android.view.animation.*;
-import java.util.*;
-import java.text.*;
+
 import android.support.v7.app.AppCompatActivity;
 import android.support.design.widget.FloatingActionButton;
+
 import java.util.HashMap;
 import java.util.ArrayList;
+
 import android.widget.LinearLayout;
 import android.widget.Button;
 import android.widget.TextView;
@@ -30,521 +20,401 @@ import android.widget.BaseAdapter;
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.content.Intent;
-import android.net.Uri;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.view.View;
 import android.widget.AdapterView;
+
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+
 import android.content.ClipData;
 import android.content.ClipboardManager;
 
 public class MainActivity extends AppCompatActivity {
-	
-	
-	private FloatingActionButton _fab;
-	private double index = 0;
-	private double temp1 = 0;
-	private double index2 = 0;
-	private HashMap<String, Object> temp2 = new HashMap<>();
-	private String CAnL_return = "";
-	private String temp3 = "";
-	private double character_limit = 0;
-	private double lines_count = 0;
-	private double position = 0;
-	
-	private ArrayList<HashMap<String, Object>> all_lists = new ArrayList<>();
-	private ArrayList<HashMap<String, Object>> todo_list = new ArrayList<>();
-	private ArrayList<String> spinnerOptions = new ArrayList<>();
-	
-	private LinearLayout linear_toolbar;
-	private LinearLayout linear_all;
-	private Button settings_b;
-	private TextView textview1;
-	private Button about_b;
-	private Spinner spinner;
-	private ListView listview1;
-	
-	private SharedPreferences f;
-	private Intent i = new Intent();
-	private AlertDialog.Builder d;
-	private AlertDialog.Builder d_single_button;
-	private AlertDialog.Builder d1;
-	private AlertDialog.Builder d2;
-	private AlertDialog.Builder d3;
-	private Intent i1 = new Intent();
-	@Override
-	protected void onCreate(Bundle _savedInstanceState) {
-		super.onCreate(_savedInstanceState);
-		setContentView(R.layout.main);
-		initialize(_savedInstanceState);
-		initializeLogic();
-	}
-	
-	private void initialize(Bundle _savedInstanceState) {
-		
-		_fab = (FloatingActionButton) findViewById(R.id._fab);
-		
-		linear_toolbar = (LinearLayout) findViewById(R.id.linear_toolbar);
-		linear_all = (LinearLayout) findViewById(R.id.linear_all);
-		settings_b = (Button) findViewById(R.id.settings_b);
-		textview1 = (TextView) findViewById(R.id.textview1);
-		about_b = (Button) findViewById(R.id.about_b);
-		spinner = (Spinner) findViewById(R.id.spinner);
-		listview1 = (ListView) findViewById(R.id.listview1);
-		f = getSharedPreferences("data", Activity.MODE_PRIVATE);
-		d = new AlertDialog.Builder(this);
-		d_single_button = new AlertDialog.Builder(this);
-		d1 = new AlertDialog.Builder(this);
-		d2 = new AlertDialog.Builder(this);
-		d3 = new AlertDialog.Builder(this);
-		
-		settings_b.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View _view) {
-				i.setClass(getApplicationContext(), SettingsActivity.class);
-				startActivity(i);
-			}
-		});
-		
-		about_b.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View _view) {
-				d_single_button.setTitle("About");
-				d_single_button.setMessage("This app created by Chananya © חנניה. You may use it and share it freely, but you may not charge money for it.\n\nYou can send me your comments and ideas to chananya@g.jct.ac.il.\n\nEnjoy!");
-				d_single_button.setNegativeButton("OK", new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface _dialog, int _which) {
-						
-					}
-				});
-				d_single_button.create().show();
-			}
-		});
-		
-		spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-			@Override
-			public void onItemSelected(AdapterView<?> _param1, View _param2, int _param3, long _param4) {
-				final int _position = _param3;
-				//'position' (not '_position', the parameter) should hold the position in 'all_lists' of the selected item
-				if ((position == -1) || (_position == (spinnerOptions.size() - 1))) {
-					return;
-				}
-				todo_list = new Gson().fromJson(all_lists.get((int)position).get("list").toString(), new TypeToken<ArrayList<HashMap<String, Object>>>(){}.getType());
-				temp3 = all_lists.get((int)position).get("title").toString().concat(":\n");
-				temp1 = 0;
-				for(int _repeat37 = 0; _repeat37 < (int)(todo_list.size()); _repeat37++) {
-					if (todo_list.get((int)temp1).get("done").toString().equals("true")) {
-						temp3 = temp3.concat("✓ ".concat(todo_list.get((int)temp1).get("text").toString()).concat("\n"));
-					}
-					else {
-						temp3 = temp3.concat("× ".concat(todo_list.get((int)temp1).get("text").toString()).concat("\n"));
-					}
-					temp1++;
-				}
-				if (temp3.length() > 0) {
-					temp3 = temp3.substring((int)(0), (int)(temp3.length() - 1));
-				}
-				if (_position == 0) {
-					((ClipboardManager) getSystemService(getApplicationContext().CLIPBOARD_SERVICE)).setPrimaryClip(ClipData.newPlainText("clipboard", temp3));
-					SketchwareUtil.showMessage(getApplicationContext(), "copied to clipboard!");
-					_reset_spinner();
-				}
-				else {
-					if (_position == 1) {
-						i1 = new Intent(android.content.Intent.ACTION_SEND);
-						i1.setType("text/plain");
-						i1.putExtra(android.content.Intent.EXTRA_SUBJECT, "My list");
-						i1.putExtra(android.content.Intent.EXTRA_TEXT, temp3);
-						startActivity(i1);
-						_reset_spinner();
-					}
-					else {
-						if (_position == 2) {
-							d.setTitle("Delete this list?");
-							d.setMessage(all_lists.get((int)position).get("title").toString());
-							d.setPositiveButton("delete", new DialogInterface.OnClickListener() {
-								@Override
-								public void onClick(DialogInterface _dialog, int _which) {
-									all_lists.remove((int)(position));
-									f.edit().putString("all lists", new Gson().toJson(all_lists)).commit();
-									((BaseAdapter)listview1.getAdapter()).notifyDataSetChanged();
-									_reset_spinner();
-								}
-							});
-							d.setNegativeButton("cancel", new DialogInterface.OnClickListener() {
-								@Override
-								public void onClick(DialogInterface _dialog, int _which) {
-									_reset_spinner();
-								}
-							});
-							d.create().show();
-						}
-						else {
-							_reset_spinner();
-							return;
-						}
-					}
-				}
-			}
-			
-			@Override
-			public void onNothingSelected(AdapterView<?> _param1) {
-				
-			}
-		});
-		
-		listview1.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-			@Override
-			public void onItemClick(AdapterView<?> _param1, View _param2, int _param3, long _param4) {
-				final int _position = _param3;
-				i.setClass(getApplicationContext(), TodoListActivity.class);
-				i.putExtra("item No.", String.valueOf((long)(_position)));
-				startActivity(i);
-			}
-		});
-		
-		listview1.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-			@Override
-			public boolean onItemLongClick(AdapterView<?> _param1, View _param2, int _param3, long _param4) {
-				final int _position = _param3;
-				position = _position;
-				spinner.performClick();
-				return true;
-			}
-		});
-		
-		_fab.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View _view) {
-				i.setClass(getApplicationContext(), TodoListActivity.class);
-				i.putExtra("item No.", "-1");
-				startActivity(i);
-			}
-		});
-	}
-	private void initializeLogic() {
-		spinnerOptions.add("copy");
-		spinnerOptions.add("share");
-		spinnerOptions.add("delete");
-		spinnerOptions.add("cancel");
-		spinner.setAdapter(new ArrayAdapter<String>(getBaseContext(), android.R.layout.simple_spinner_dropdown_item, spinnerOptions));
-		spinner.setGravity(Gravity.CENTER_HORIZONTAL);
-		_reset_spinner();
-		if (f.getString("tutorial", "").equals("")) {
-			f.edit().putString("tutorial", "done").commit();
-			_show_tutorial();
-		}
-	}
-	
-	@Override
-	protected void onActivityResult(int _requestCode, int _resultCode, Intent _data) {
-		super.onActivityResult(_requestCode, _resultCode, _data);
-		
-		switch (_requestCode) {
-			
-			default:
-			break;
-		}
-	}
-	
-	@Override
-	public void onResume() {
-		super.onResume();
-		if (f.getString("all lists", "").equals("")) {
-			f.edit().putString("all lists", "[]").commit();
-		}
-		if (f.getString("lines count", "").equals("")) {
-			f.edit().putString("lines count", "5").commit();
-		}
-		if (f.getString("character limit", "").equals("")) {
-			f.edit().putString("character limit", "100").commit();
-		}
-		all_lists = new Gson().fromJson(f.getString("all lists", ""), new TypeToken<ArrayList<HashMap<String, Object>>>(){}.getType());
-		lines_count = Double.parseDouble(f.getString("lines count", ""));
-		character_limit = Double.parseDouble(f.getString("character limit", ""));
-		listview1.setAdapter(new Listview1Adapter(all_lists));
-	}
-	
-	@Override
-	public void onPause() {
-		super.onPause();
-		f.edit().putString("all lists", new Gson().toJson(all_lists)).commit();
-	}
-	private void _cut_after_n_lines (final String _string, final double _n) {
-		if (_n == 0) {
-			CAnL_return = "...";
-		}
-		else {
-			int pos=_string.indexOf("\n"), n=(int)_n;
-			while (--n > 0 && pos != -1) {
-				pos = _string.indexOf("\n",pos+1);
-			}
-			temp1 = pos;
-			if (temp1 == -1) {
-				CAnL_return = _string;
-			}
-			else {
-				CAnL_return = _string.substring((int)(0), (int)(temp1));
-				CAnL_return = CAnL_return.concat("\n...");
-			}
-		}
-	}
-	
-	
-	private void _paintView (final View _view, final double _id) {
-		if (_id == 0) {
-			_view.setBackgroundColor(0xFFFFFFFF);
-			return;
-		}
-		if (_id == 1) {
-			_view.setBackgroundColor(0xFFF44336);
-			return;
-		}
-		if (_id == 2) {
-			_view.setBackgroundColor(0xFFBA68C8);
-			return;
-		}
-		if (_id == 3) {
-			_view.setBackgroundColor(0xFF7986CB);
-			return;
-		}
-		if (_id == 4) {
-			_view.setBackgroundColor(0xFF42A5F5);
-			return;
-		}
-		if (_id == 5) {
-			_view.setBackgroundColor(0xFF4CAF50);
-			return;
-		}
-		if (_id == 6) {
-			_view.setBackgroundColor(0xFFFFEE58);
-			return;
-		}
-		if (_id == 7) {
-			_view.setBackgroundColor(0xFFFFCA28);
-			return;
-		}
-		if (_id == 8) {
-			_view.setBackgroundColor(0xFFFF9800);
-			return;
-		}
-		if (_id == 9) {
-			_view.setBackgroundColor(0xFFA1887F);
-			return;
-		}
-		if (_id == 10) {
-			_view.setBackgroundColor(0xFF78909C);
-			return;
-		}
-	}
-	
-	
-	private void _refreshListView () {
-		((BaseAdapter)listview1.getAdapter()).notifyDataSetChanged();
-	}
-	
-	
-	private void _show_tutorial () {
-		d.setTitle("tutorial #1");
-		d.setMessage("Welcome to TODO list app!\n\nHere you can create your own lists so you won't forget to buy anything from the store, or to take equipment to a trip.\n\nOn the main screen all your lists appears in minimize mode. Pressing on the little triangle will expand the list and show it all. (On the settings screen you can change the settings of the minimize mode to your favorite size).");
-		d.setPositiveButton("next", new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface _dialog, int _which) {
-				d1.setTitle("tutorial #2");
-				d1.setMessage("To add a new list just tap on the big, gray 'plus' button at the bottom of the screen. To see existing list, click on it, and it'll enter editing mode, where you can change the background color (upper right on the screen to show/hide coloring menu), and of course add new items to the list, and updating, deleting or mark as 'done' existing items.");
-				d1.setPositiveButton("next", new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface _dialog, int _which) {
-						d2.setTitle("tutorial #3");
-						d2.setMessage("At the beginning the title of the list will be in focus, but one click on 'enter' will move the cursor to 'add new item' line.\n\nNote: each item can hold only one line. So if 'enter' was pressed - new item will be added, or the next item will be in the updating line.");
-						d2.setPositiveButton("next", new DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(DialogInterface _dialog, int _which) {
-								d3.setTitle("tutorial #4");
-								d3.setMessage("Enjoy!");
-								d3.setPositiveButton("Got it!", new DialogInterface.OnClickListener() {
-									@Override
-									public void onClick(DialogInterface _dialog, int _which) {
-										f.edit().putString("tutorial", "done").commit();
-									}
-								});
-								d3.setNegativeButton("show me also next time", new DialogInterface.OnClickListener() {
-									@Override
-									public void onClick(DialogInterface _dialog, int _which) {
-										f.edit().remove("tutorial").commit();
-									}
-								});
-								d3.create().show();
-							}
-						});
-						d2.setNegativeButton("close", new DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(DialogInterface _dialog, int _which) {
-								
-							}
-						});
-						d2.create().show();
-					}
-				});
-				d1.setNegativeButton("close", new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface _dialog, int _which) {
-						
-					}
-				});
-				d1.create().show();
-			}
-		});
-		d.setNegativeButton("close", new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface _dialog, int _which) {
-				
-			}
-		});
-		d.create().show();
-	}
-	
-	
-	private void _reset_spinner () {
-		position = -1;
-		spinner.setSelection((int)(spinnerOptions.size() - 1));
-	}
-	
-	
-	public class Listview1Adapter extends BaseAdapter {
-		ArrayList<HashMap<String, Object>> _data;
-		public Listview1Adapter(ArrayList<HashMap<String, Object>> _arr) {
-			_data = _arr;
-		}
-		
-		@Override
-		public int getCount() {
-			return _data.size();
-		}
-		
-		@Override
-		public HashMap<String, Object> getItem(int _index) {
-			return _data.get(_index);
-		}
-		
-		@Override
-		public long getItemId(int _index) {
-			return _index;
-		}
-		@Override
-		public View getView(final int _position, View _view, ViewGroup _viewGroup) {
-			LayoutInflater _inflater = (LayoutInflater)getBaseContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			View _v = _view;
-			if (_v == null) {
-				_v = _inflater.inflate(R.layout.item_list, null);
-			}
-			
-			final LinearLayout linear_all = (LinearLayout) _v.findViewById(R.id.linear_all);
-			final LinearLayout linear2 = (LinearLayout) _v.findViewById(R.id.linear2);
-			final TextView summary = (TextView) _v.findViewById(R.id.summary);
-			final Button expand_b = (Button) _v.findViewById(R.id.expand_b);
-			final TextView title = (TextView) _v.findViewById(R.id.title);
-			
-			_paintView(linear_all, Double.parseDouble(_data.get((int)_position).get("color").toString()));
-			expand_b.setOnClickListener(new View.OnClickListener() {
-				@Override public void onClick(View v) {
-					temp2 = _data.get((int)_position);
-					if (expand_b.getRotation() == 0) {
-						temp2.put("expand", "true");
-					}
-					else {
-						temp2.put("expand", "false");
-					}
-					_data.remove((int)(_position));
-					_data.add((int)_position, temp2);
-					_refreshListView();
-				}
-			});
-			title.setText(_data.get((int)_position).get("title").toString());
-			todo_list = new Gson().fromJson(_data.get((int)_position).get("list").toString(), new TypeToken<ArrayList<HashMap<String, Object>>>(){}.getType());
-			summary.setText("");
-			index = 0;
-			for(int _repeat24 = 0; _repeat24 < (int)(todo_list.size()); _repeat24++) {
-				if (todo_list.get((int)index).get("done").toString().equals("true")) {
-					summary.setText(summary.getText().toString().concat("✓ ".concat(todo_list.get((int)index).get("text").toString()).concat("\n")));
-				}
-				else {
-					summary.setText(summary.getText().toString().concat("× ".concat(todo_list.get((int)index).get("text").toString()).concat("\n")));
-				}
-				index++;
-			}
-			if (summary.getText().toString().length() > 0) {
-				summary.setText(summary.getText().toString().substring((int)(0), (int)(summary.getText().toString().length() - 1)));
-			}
-			if (_data.get((int)_position).get("expand").toString().equals("true")) {
-				expand_b.setRotation((float)(180));
-			}
-			else {
-				if (summary.getText().toString().length() > character_limit) {
-					summary.setText(summary.getText().toString().substring((int)(0), (int)(character_limit)).concat("..."));
-				}
-				if (!(lines_count == 16)) {
-					_cut_after_n_lines(summary.getText().toString(), lines_count);
-					summary.setText(CAnL_return);
-				}
-				expand_b.setRotation((float)(0));
-			}
-			
-			return _v;
-		}
-	}
-	
-	@Deprecated
-	public void showMessage(String _s) {
-		Toast.makeText(getApplicationContext(), _s, Toast.LENGTH_SHORT).show();
-	}
-	
-	@Deprecated
-	public int getLocationX(View _v) {
-		int _location[] = new int[2];
-		_v.getLocationInWindow(_location);
-		return _location[0];
-	}
-	
-	@Deprecated
-	public int getLocationY(View _v) {
-		int _location[] = new int[2];
-		_v.getLocationInWindow(_location);
-		return _location[1];
-	}
-	
-	@Deprecated
-	public int getRandom(int _min, int _max) {
-		Random random = new Random();
-		return random.nextInt(_max - _min + 1) + _min;
-	}
-	
-	@Deprecated
-	public ArrayList<Double> getCheckedItemPositionsToArray(ListView _list) {
-		ArrayList<Double> _result = new ArrayList<Double>();
-		SparseBooleanArray _arr = _list.getCheckedItemPositions();
-		for (int _iIdx = 0; _iIdx < _arr.size(); _iIdx++) {
-			if (_arr.valueAt(_iIdx))
-			_result.add((double)_arr.keyAt(_iIdx));
-		}
-		return _result;
-	}
-	
-	@Deprecated
-	public float getDip(int _input){
-		return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, _input, getResources().getDisplayMetrics());
-	}
-	
-	@Deprecated
-	public int getDisplayWidthPixels(){
-		return getResources().getDisplayMetrics().widthPixels;
-	}
-	
-	@Deprecated
-	public int getDisplayHeightPixels(){
-		return getResources().getDisplayMetrics().heightPixels;
-	}
-	
+
+    public static HashMap<Integer, Integer> colors;
+
+    private Context context;
+    private SharedPreferences sharedPreferences;
+
+    private int characterLimit = 0;
+    private int linesCount = 0;
+    private int selectedListPosition = 0;
+
+    private ArrayList<HashMap<String, Object>> all_lists = new ArrayList<>();
+    private ArrayList<HashMap<String, Object>> todo_list = new ArrayList<>();
+    private ArrayList<String> spinnerOptions = new ArrayList<>();
+
+    private Spinner menu_spinner;
+    private ListView todoLists;
+
+
+    @Override
+    protected void onCreate(Bundle _savedInstanceState) {
+        super.onCreate(_savedInstanceState);
+        setContentView(R.layout.main);
+        initialize(_savedInstanceState);
+        initializeLogic();
+    }
+
+    private void initialize(Bundle _savedInstanceState) {
+        context = MainActivity.this;
+
+        FloatingActionButton floatingActionButton = findViewById(R.id.fab);
+        Button settings_b = findViewById(R.id.settings_b);
+        Button about_b = findViewById(R.id.about_b);
+        menu_spinner = findViewById(R.id.spinner);
+        todoLists = findViewById(R.id.listview1);
+
+        sharedPreferences = getSharedPreferences(Consts.SharedPreferencesName, Activity.MODE_PRIVATE);
+
+        colors = new HashMap<>();
+
+        settings_b.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent();
+                intent.setClass(context, SettingsActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        about_b.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlertDialog.Builder about_dialog = new AlertDialog.Builder(context);
+                about_dialog.setTitle(R.string.about_title);
+                about_dialog.setMessage(R.string.about_content);
+                about_dialog.setNegativeButton(R.string.ok, null);
+                about_dialog.create().show();
+            }
+        });
+
+        menu_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> _param1, View _param2, int selected_menu_item_position, long _param4) {
+                if ((selectedListPosition == -1) || (selected_menu_item_position == (spinnerOptions.size() - 1))) {
+                    return;
+                }
+
+                todo_list = new Gson().fromJson(all_lists.get(selectedListPosition).get(Consts.KEY_LIST).toString(), new TypeToken<ArrayList<HashMap<String, Object>>>() {
+                }.getType());
+                String list_preview = all_lists.get(selectedListPosition).get(Consts.KEY_TITLE).toString() + ":" + Consts.NEW_LINE;
+                for (HashMap<String, Object> itemsMap : todo_list) {
+                    if (itemsMap.get(Consts.KEY_DONE) == true) {
+                        list_preview += Consts.V;
+                    } else {
+                        list_preview += Consts.X;
+                    }
+                    list_preview += itemsMap.get(Consts.KEY_TEXT).toString() + Consts.NEW_LINE;
+                }
+                if (list_preview.length() > 0) {
+                    list_preview = list_preview.substring(0, list_preview.length() - 1); // remove last new line
+                }
+
+                if (selected_menu_item_position == 0) { // copy
+                    ((ClipboardManager) getSystemService(CLIPBOARD_SERVICE)).setPrimaryClip(ClipData.newPlainText("clipboard", list_preview));
+                    SketchwareUtil.showMessage(context, getString(R.string.copied_to_clipboard));
+                    resetSpinner();
+                } else if (selected_menu_item_position == 1) { // share
+                    Intent intent = new Intent(android.content.Intent.ACTION_SEND);
+                    intent.setType("text/plain");
+                    intent.putExtra(android.content.Intent.EXTRA_SUBJECT, "My list");
+                    intent.putExtra(android.content.Intent.EXTRA_TEXT, list_preview);
+                    startActivity(intent);
+                    resetSpinner();
+                } else if (selected_menu_item_position == 2) { // delete
+                    AlertDialog.Builder d = new AlertDialog.Builder(context);
+                    d.setTitle(R.string.delete_title);
+                    d.setMessage(all_lists.get(selectedListPosition).get(Consts.KEY_TITLE).toString());
+                    d.setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface _dialog, int _which) {
+                            all_lists.remove((int) (selectedListPosition));
+                            sharedPreferences.edit().putString(Consts.KEY_ALL_LISTS, new Gson().toJson(all_lists)).commit();
+                            ((BaseAdapter) todoLists.getAdapter()).notifyDataSetChanged();
+                            resetSpinner();
+                        }
+                    });
+                    d.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface _dialog, int _which) {
+                            resetSpinner();
+                        }
+                    });
+                    d.create().show();
+                } else { // cancel
+                    resetSpinner();
+                    return;
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> _param1) {
+            }
+        });
+
+        todoLists.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> _param1, View _param2, int _position, long _param4) {
+                Intent intent = new Intent();
+                intent.setClass(context, TodoListActivity.class);
+                intent.putExtra(Consts.ITEM_NUMBER, _position);
+                startActivity(intent);
+            }
+        });
+
+        todoLists.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> _param1, View _param2, int _position, long _param4) {
+                selectedListPosition = _position;
+                menu_spinner.performClick();
+                return true;
+            }
+        });
+
+        floatingActionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View _view) {
+                Intent intent = new Intent();
+                intent.setClass(context, TodoListActivity.class);
+                intent.putExtra(Consts.ITEM_NUMBER, Consts.NO_ITEM);
+                startActivity(intent);
+            }
+        });
+    }
+
+    private void initializeLogic() {
+        colors.clear();
+        colors.put(0, 0xFFFFFFFF);
+        colors.put(1, 0xFFF44336);
+        colors.put(2, 0xFFBA68C8);
+        colors.put(3, 0xFF7986CB);
+        colors.put(4, 0xFF42A5F5);
+        colors.put(5, 0xFF4CAF50);
+        colors.put(6, 0xFFFFEE58);
+        colors.put(7, 0xFFFFCA28);
+        colors.put(8, 0xFFFF9800);
+        colors.put(9, 0xFFA1887F);
+        colors.put(10, 0xFF78909C);
+
+        spinnerOptions.add(getString(R.string.copy));
+        spinnerOptions.add(getString(R.string.share));
+        spinnerOptions.add(getString(R.string.delete));
+        spinnerOptions.add(getString(R.string.cancel));
+        menu_spinner.setAdapter(new ArrayAdapter<String>(getBaseContext(), android.R.layout.simple_spinner_dropdown_item, spinnerOptions));
+        menu_spinner.setGravity(Gravity.CENTER_HORIZONTAL);
+        resetSpinner();
+        if (sharedPreferences.getString(Consts.KEY_TUTORIAL, Consts.EMPTY_STRING).equals(Consts.EMPTY_STRING)) {
+            sharedPreferences.edit().putString(Consts.KEY_TUTORIAL, "done").apply();
+            showTutorial();
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        switch (requestCode) {
+
+            default:
+                break;
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (sharedPreferences.getString(Consts.KEY_ALL_LISTS, Consts.EMPTY_STRING).equals(Consts.EMPTY_STRING)) {
+            sharedPreferences.edit().putString(Consts.KEY_ALL_LISTS, "[]").commit();
+        }
+        if (sharedPreferences.getInt(Consts.KEY_LINES_COUNT, Consts.INVALID_LINES_COUNT) == Consts.INVALID_LINES_COUNT) {
+            sharedPreferences.edit().putInt(Consts.KEY_LINES_COUNT, Consts.DEFAULT_LINES_COUNT).commit();
+        }
+        if (sharedPreferences.getInt(Consts.KEY_CHARACTER_LIMIT, Consts.INVALID_CHARACTER_LIMIT) == Consts.INVALID_CHARACTER_LIMIT) {
+            sharedPreferences.edit().putInt(Consts.KEY_CHARACTER_LIMIT, Consts.DEFAULT_CHARACTER_LIMIT).commit();
+        }
+        all_lists = new Gson().fromJson(sharedPreferences.getString(Consts.KEY_ALL_LISTS, Consts.EMPTY_STRING), new TypeToken<ArrayList<HashMap<String, Object>>>() {
+        }.getType());
+        linesCount = sharedPreferences.getInt(Consts.KEY_LINES_COUNT, Consts.DEFAULT_LINES_COUNT);
+        characterLimit = sharedPreferences.getInt(Consts.KEY_CHARACTER_LIMIT, Consts.DEFAULT_CHARACTER_LIMIT);
+        todoLists.setAdapter(new ToDoListsAdapter(all_lists));
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        sharedPreferences.edit().putString(Consts.KEY_ALL_LISTS, new Gson().toJson(all_lists)).commit();
+    }
+
+    private String cutAfterNLines(final String string, final int n) {
+        String nLines = Consts.EMPTY_STRING;
+        if (n == 0) {
+            nLines = Consts.SO_ON;
+        } else {
+            // find the position of the n-th new line
+            int pos = string.indexOf(Consts.NEW_LINE);
+            for (int i = 0; i < n && pos != -1; i++) {
+                pos = string.indexOf(Consts.NEW_LINE, pos + 1);
+            }
+
+            int nthEndLine = pos;
+            if (nthEndLine == -1) {
+                nLines = string;
+            } else {
+                nLines = string.substring(0, nthEndLine) + Consts.NEW_LINE + Consts.SO_ON;
+            }
+        }
+        return nLines;
+    }
+
+
+    private void paintView(final View view, final int id) {
+        view.setBackgroundColor(colors.get(id));
+    }
+
+
+    private void refreshListView() {
+        ((BaseAdapter) todoLists.getAdapter()).notifyDataSetChanged();
+    }
+
+
+    private void showTutorial() {
+        final AlertDialog.Builder d = new AlertDialog.Builder(context);
+        final AlertDialog.Builder d1 = new AlertDialog.Builder(context);
+        final AlertDialog.Builder d2 = new AlertDialog.Builder(context);
+        final AlertDialog.Builder d3 = new AlertDialog.Builder(context);
+        d.setTitle(R.string.tutorial_1_title);
+        d.setMessage(R.string.tutorial_1_content);
+        d.setPositiveButton(R.string.next, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface _dialog, int _which) {
+                d1.setTitle(R.string.tutorial_2_title);
+                d1.setMessage(R.string.tutorial_2_content);
+                d1.setPositiveButton(R.string.next, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface _dialog, int _which) {
+                        d2.setTitle(R.string.tutorial_3_title);
+                        d2.setMessage(R.string.tutorial_3_content);
+                        d2.setPositiveButton(R.string.next, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface _dialog, int _which) {
+                                d3.setTitle(R.string.tutorial_4_title);
+                                d3.setMessage(R.string.tutorial_4_content);
+                                d3.setPositiveButton(R.string.got_it, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface _dialog, int _which) {
+                                        sharedPreferences.edit().putString(Consts.KEY_TUTORIAL, "done").commit();
+                                    }
+                                });
+                                d3.setNegativeButton(R.string.show_again, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface _dialog, int _which) {
+                                        sharedPreferences.edit().remove(Consts.KEY_TUTORIAL).commit();
+                                    }
+                                });
+                                d3.create().show();
+                            }
+                        });
+                        d2.setNegativeButton(R.string.close, null);
+                        d2.create().show();
+                    }
+                });
+                d1.setNegativeButton(R.string.close, null);
+                d1.create().show();
+            }
+        });
+        d.setNegativeButton(R.string.close, null);
+        d.create().show();
+    }
+
+
+    private void resetSpinner() {
+        selectedListPosition = -1;
+        menu_spinner.setSelection(spinnerOptions.size() - 1);
+    }
+
+
+    public class ToDoListsAdapter extends BaseAdapter {
+        ArrayList<HashMap<String, Object>> lists;
+
+        public ToDoListsAdapter(ArrayList<HashMap<String, Object>> arr) {
+            lists = arr;
+        }
+
+        @Override
+        public int getCount() {
+            return lists.size();
+        }
+
+        @Override
+        public HashMap<String, Object> getItem(int index) {
+            return lists.get(index);
+        }
+
+        @Override
+        public long getItemId(int index) {
+            return index;
+        }
+
+        @Override
+        public View getView(final int position, View view, ViewGroup viewGroup) {
+            LayoutInflater inflater = (LayoutInflater) getBaseContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            if (view == null) {
+                view = inflater.inflate(R.layout.item_list, null);
+            }
+
+            final LinearLayout linear_all = view.findViewById(R.id.linear_all);
+            final TextView summary = view.findViewById(R.id.summary);
+            final Button expand_b = view.findViewById(R.id.expand_b);
+            final TextView title = view.findViewById(R.id.title);
+
+            paintView(linear_all, (int)lists.get(position).get(Consts.KEY_COLOR));
+            expand_b.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    HashMap<String, Object> temp2 = lists.get(position);
+                    if (expand_b.getRotation() == 0) {
+                        temp2.put(Consts.KEY_EXPAND, true);
+                    } else {
+                        temp2.put(Consts.KEY_EXPAND, false);
+                    }
+                    lists.remove(position);
+                    lists.add(position, temp2);
+                    refreshListView();
+                }
+            });
+            title.setText(lists.get(position).get(Consts.KEY_TITLE).toString());
+            todo_list = new Gson().fromJson(lists.get(position).get(Consts.KEY_LIST).toString(), new TypeToken<ArrayList<HashMap<String, Object>>>() {
+            }.getType());
+
+            String listSummary = Consts.EMPTY_STRING;
+            for (HashMap<String, Object> itemsMap : todo_list) {
+                if (itemsMap.get(Consts.KEY_DONE) == true) {
+                    listSummary += Consts.V;
+                } else {
+                    listSummary += Consts.X;
+                }
+                listSummary += itemsMap.get(Consts.KEY_TEXT).toString() + Consts.NEW_LINE;
+            }
+            if (listSummary.length() > 0) {
+                listSummary = listSummary.substring(0, listSummary.length() - 1);
+            }
+            if (lists.get(position).get(Consts.KEY_EXPAND) == true) {
+                expand_b.setRotation((float) (180));
+            } else {
+                if (listSummary.length() > characterLimit) {
+                    listSummary = listSummary.substring(0, characterLimit) + Consts.SO_ON;
+                }
+                if (linesCount != 16) {
+                    listSummary = cutAfterNLines(listSummary, linesCount);
+                }
+                expand_b.setRotation(0);
+            }
+            summary.setText(listSummary);
+
+            return view;
+        }
+    }
 }
