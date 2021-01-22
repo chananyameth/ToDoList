@@ -1,50 +1,33 @@
 package com.chananya.todolist;
 
-import android.os.*;
-
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-
-import android.widget.LinearLayout;
-import android.widget.SeekBar;
-import android.widget.Button;
-import android.widget.TextView;
-import android.widget.ImageView;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.app.Activity;
-import android.content.SharedPreferences;
-import android.content.Intent;
-import android.view.View;
+import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.SeekBar;
+import android.widget.TextView;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import java.util.ArrayList;
+
 public class SettingsActivity extends AppCompatActivity {
     private String allText = Consts.EMPTY_STRING;
 
-    private LinearLayout linear_all;
-    private LinearLayout linear6;
     private SeekBar lines_count_sb;
-    private LinearLayout linear7;
     private SeekBar character_limit_sb;
-    private Button restore_b;
-    private LinearLayout linear8;
-    private Button delete_all_b;
-    private Button tutorial_b;
-    private Button help_b;
-    private TextView textview4;
     private TextView lines_count_tv;
-    private TextView textview6;
     private TextView character_limit_tv;
-    private ImageView copy_iv;
-    private TextView textview7;
-    private ImageView share_iv;
 
     private SharedPreferences f;
     private AlertDialog.Builder d;
@@ -53,11 +36,11 @@ public class SettingsActivity extends AppCompatActivity {
     protected void onCreate(Bundle _savedInstanceState) {
         super.onCreate(_savedInstanceState);
         setContentView(R.layout.settings);
-        initialize(_savedInstanceState);
+        initialize();
         initializeLogic();
     }
 
-    private void initialize(Bundle _savedInstanceState) {
+    private void initialize() {
 
         Toolbar toolbar = (Toolbar) findViewById(R.id._toolbar);
         setSupportActionBar(toolbar);
@@ -69,23 +52,16 @@ public class SettingsActivity extends AppCompatActivity {
                 onBackPressed();
             }
         });
-        linear_all = (LinearLayout) findViewById(R.id.linear_all);
-        linear6 = (LinearLayout) findViewById(R.id.linear6);
         lines_count_sb = (SeekBar) findViewById(R.id.lines_count_sb);
-        linear7 = (LinearLayout) findViewById(R.id.linear7);
         character_limit_sb = (SeekBar) findViewById(R.id.character_limit_sb);
-        restore_b = (Button) findViewById(R.id.restore_b);
-        linear8 = (LinearLayout) findViewById(R.id.linear8);
-        delete_all_b = (Button) findViewById(R.id.delete_all_b);
-        tutorial_b = (Button) findViewById(R.id.tutorial_b);
-        help_b = (Button) findViewById(R.id.help_b);
-        textview4 = (TextView) findViewById(R.id.textview4);
+        Button restore_b = (Button) findViewById(R.id.restore_b);
+        Button delete_all_b = (Button) findViewById(R.id.delete_all_b);
+        Button tutorial_b = (Button) findViewById(R.id.tutorial_b);
+        Button help_b = (Button) findViewById(R.id.help_b);
         lines_count_tv = (TextView) findViewById(R.id.lines_count_tv);
-        textview6 = (TextView) findViewById(R.id.textview6);
         character_limit_tv = (TextView) findViewById(R.id.character_limit_tv);
-        copy_iv = (ImageView) findViewById(R.id.copy_iv);
-        textview7 = (TextView) findViewById(R.id.textview7);
-        share_iv = (ImageView) findViewById(R.id.share_iv);
+        ImageView copy_iv = (ImageView) findViewById(R.id.copy_iv);
+        ImageView share_iv = (ImageView) findViewById(R.id.share_iv);
         f = getSharedPreferences(Consts.SharedPreferencesName, Activity.MODE_PRIVATE);
         d = new AlertDialog.Builder(this);
 
@@ -93,9 +69,9 @@ public class SettingsActivity extends AppCompatActivity {
             @Override
             public void onProgressChanged(SeekBar _param1, int _progressValue, boolean _param3) {
                 if (_progressValue == 16) {
-                    lines_count_tv.setText("all");
+                    lines_count_tv.setText(R.string.all);
                 } else {
-                    lines_count_tv.setText(String.valueOf((long) (_progressValue)));
+                    lines_count_tv.setText(String.valueOf(_progressValue));
                 }
             }
 
@@ -157,7 +133,7 @@ public class SettingsActivity extends AppCompatActivity {
                 d.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface _dialog, int _which) {
-                        f.edit().remove(Consts.KEY_ALL_LISTS).commit();
+                        f.edit().remove(Consts.KEY_ALL_LISTS).apply();
                     }
                 });
                 d.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
@@ -173,7 +149,7 @@ public class SettingsActivity extends AppCompatActivity {
         tutorial_b.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View _view) {
-                f.edit().remove(Consts.KEY_TUTORIAL).commit();
+                f.edit().remove(Consts.KEY_TUTORIAL).apply();
                 SketchwareUtil.showMessage(getApplicationContext(), getString(R.string.done));
             }
         });
@@ -205,7 +181,7 @@ public class SettingsActivity extends AppCompatActivity {
                                         d3.setPositiveButton(R.string.got_it, new DialogInterface.OnClickListener() {
                                             @Override
                                             public void onClick(DialogInterface _dialog, int _which) {
-                                                f.edit().putString(Consts.KEY_TUTORIAL, "done").commit();
+                                                f.edit().putString(Consts.KEY_TUTORIAL, "done").apply();
                                             }
                                         });
                                         d3.create().show();
@@ -267,44 +243,33 @@ public class SettingsActivity extends AppCompatActivity {
         character_limit_sb.setProgress(f.getInt(Consts.KEY_CHARACTER_LIMIT, Consts.DEFAULT_CHARACTER_LIMIT) / 10);
     }
 
-    @Override
-    protected void onActivityResult(int _requestCode, int _resultCode, Intent _data) {
-        super.onActivityResult(_requestCode, _resultCode, _data);
-
-        switch (_requestCode) {
-
-            default:
-                break;
-        }
-    }
 
     @Override
     public void onPause() {
         super.onPause();
-        f.edit().putInt(Consts.KEY_LINES_COUNT, lines_count_sb.getProgress()).commit();
-        f.edit().putInt(Consts.KEY_CHARACTER_LIMIT, character_limit_sb.getProgress() * 10).commit();
+        f.edit().putInt(Consts.KEY_LINES_COUNT, lines_count_sb.getProgress()).apply();
+        f.edit().putInt(Consts.KEY_CHARACTER_LIMIT, character_limit_sb.getProgress() * 10).apply();
     }
 
     private void allLists_to_allText() {
-        ArrayList<HashMap<String, Object>> allLists = new Gson().fromJson(f.getString(Consts.KEY_ALL_LISTS, Consts.EMPTY_STRING), new TypeToken<ArrayList<HashMap<String, Object>>>() {
+        ArrayList<ToDoList> allLists = new Gson().fromJson(f.getString(Consts.KEY_ALL_LISTS, Consts.EMPTY_LIST_STRING), new TypeToken<ArrayList<ToDoList>>() {
         }.getType());
         allText = Consts.EMPTY_STRING;
         for (int i = 0; i < allLists.size(); i++) {
-            ArrayList<HashMap<String, Object>> single_list = new Gson().fromJson(allLists.get(i).get(Consts.KEY_LIST).toString(), new TypeToken<ArrayList<HashMap<String, Object>>>() {
-            }.getType());
-            String item_text = allLists.get(i).get(Consts.KEY_TITLE).toString() + ":\n";
-            for (int j = 0; j < single_list.size(); j++) {
-                if (single_list.get(j).get(Consts.KEY_DONE) == true) {
-                    item_text += Consts.V;
+            ToDoList single_list = allLists.get(i);
+            StringBuilder item_text = new StringBuilder(allLists.get(i).m_title + ":" + Consts.NEW_LINE);
+            for (int j = 0; j < single_list.m_items.size(); j++) {
+                if (single_list.m_items.get(j).m_is_checked) {
+                    item_text.append(Consts.V);
                 } else {
-                    item_text += Consts.X;
+                    item_text.append(Consts.X);
                 }
-                item_text += single_list.get(j).get(Consts.KEY_TEXT).toString() + Consts.NEW_LINE;
+                item_text.append(single_list.m_items.get(j).m_content).append(Consts.NEW_LINE);
             }
             if (item_text.length() > 0) {
-                item_text = item_text.substring(0, item_text.length() - 1);
+                item_text = item_text.deleteCharAt(item_text.length() - 1);
             }
-            allText += item_text + "\n-----\n";
+            allText += item_text + Consts.NEW_LINE + "-----" + Consts.NEW_LINE;
         }
         if (allText.length() > 0) {
             allText = allText.substring(0, allText.length() - 6);

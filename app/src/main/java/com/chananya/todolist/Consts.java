@@ -1,8 +1,25 @@
 package com.chananya.todolist;
 
-public class Consts{
+import java.util.HashMap;
+
+public class Consts {
     // General
     public static final String SharedPreferencesName = "data";
+    public static HashMap<Integer, Integer> colors = new HashMap<>();
+
+    static {
+        colors.put(0, 0xFFFFFFFF);
+        colors.put(1, 0xFFF44336);
+        colors.put(2, 0xFFBA68C8);
+        colors.put(3, 0xFF7986CB);
+        colors.put(4, 0xFF42A5F5);
+        colors.put(5, 0xFF4CAF50);
+        colors.put(6, 0xFFFFEE58);
+        colors.put(7, 0xFFFFCA28);
+        colors.put(8, 0xFFFF9800);
+        colors.put(9, 0xFFA1887F);
+        colors.put(10, 0xFF78909C);
+    }
 
     //Shared Preferences keys
     public static final String KEY_ALL_LISTS = "all lists";
@@ -22,6 +39,7 @@ public class Consts{
     // Strings
     public static final String NEW_LINE = "\n";
     public static final String EMPTY_STRING = "";
+    public static final String EMPTY_LIST_STRING = "[]";
     public static final String V = "✓ ";
     public static final String X = "× ";
     public static final String SO_ON = "...";

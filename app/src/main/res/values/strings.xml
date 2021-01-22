@@ -29,5 +29,5 @@
     <string name="copy">copy</string>
     <string name="share">share</string>
     <string name="settings">Settings</string>
-    <string name="tutorial_2_content">To add a new list just tap on the big, gray \'plus\' button at the bottom of the screen. To see existing list, click on it, and it\'ll enter editing mode, where you can change the background color (upper right on the screen to show/hide coloring menu), and of course add new items to the list, and updating, deleting or mark as \'done\' existing items.</string>
+    <string name="all">all</string>
 </resources>
