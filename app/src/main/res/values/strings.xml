@@ -30,4 +30,15 @@
     <string name="share">share</string>
     <string name="settings">Settings</string>
     <string name="all">all</string>
+    <string name="title">Title</string>
+    <string name="summary">summary</string>
+    <string name="new_item">New item</string>
+    <string name="update_item">Update item</string>
+    <string name="line_to_show">Items in minimize mode:</string>
+    <string name="chars_to_show">Characters limit in minimize mode:</string>
+    <string name="restore_to_default">restore settings to default</string>
+    <string name="delete_all_existing_data">delete all existing data</string>
+    <string name="show_tutorial_on_next_opening">show tutorial on next opening</string>
+    <string name="lt_all_existing_data_gt"><![CDATA[<-- All existing data -->]]></string>
+    <string name="my_list">My list</string>
 </resources>

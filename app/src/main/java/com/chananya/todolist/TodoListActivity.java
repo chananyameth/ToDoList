@@ -1,5 +1,6 @@
 package com.chananya.todolist;
 
+import android.graphics.Paint;
 import android.os.*;
 import android.view.*;
 import android.widget.*;
@@ -8,12 +9,12 @@ import android.content.*;
 import android.support.v7.app.AppCompatActivity;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import android.widget.LinearLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.EditText;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.BaseAdapter;
 import android.app.Activity;
@@ -59,15 +60,15 @@ public class TodoListActivity extends AppCompatActivity {
         colors_hs = (HorizontalScrollView) findViewById(R.id.colors_hs);
         ImageView back_iv = (ImageView) findViewById(R.id.back_iv);
         title = (EditText) findViewById(R.id.title);
-        Button color_b = (Button) findViewById(R.id.color_b);
-        all_items = (ListView) findViewById(R.id.listview1);
+        ImageView palette_iv = (ImageView) findViewById(R.id.palette_iv);
+        all_items = (ListView) findViewById(R.id.items_lv);
         linear_add = (LinearLayout) findViewById(R.id.linear_add);
         linear_update_item = (LinearLayout) findViewById(R.id.linear_update_item);
         new_item = (EditText) findViewById(R.id.new_item);
-        Button add_item_b = (Button) findViewById(R.id.add_item_b);
+        ImageView add_item_iv = (ImageView) findViewById(R.id.add_item_iv);
         ImageView cancel_iv = (ImageView) findViewById(R.id.cancel_iv);
         edittext_update = (EditText) findViewById(R.id.edittext_update);
-        Button ok_b = (Button) findViewById(R.id.ok_b);
+        ImageView ok_iv = (ImageView) findViewById(R.id.ok_iv);
         ImageView imageview0 = (ImageView) findViewById(R.id.imageview0);
         ImageView imageview1 = (ImageView) findViewById(R.id.imageview1);
         ImageView imageview2 = (ImageView) findViewById(R.id.imageview2);
@@ -89,7 +90,7 @@ public class TodoListActivity extends AppCompatActivity {
             }
         });
 
-        color_b.setOnClickListener(new View.OnClickListener() {
+        palette_iv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View _view) {
                 if (colors_hs.getTranslationY() == 0) {
@@ -125,7 +126,7 @@ public class TodoListActivity extends AppCompatActivity {
                     } else {
                         new_item.setText(Consts.EMPTY_STRING);
                     }
-                    ((BaseAdapter) all_items.getAdapter()).notifyDataSetChanged();
+                    refreshListView();
                     all_items.smoothScrollToPosition(todo_list.m_items.size());
                 }
             }
@@ -141,14 +142,14 @@ public class TodoListActivity extends AppCompatActivity {
             }
         });
 
-        add_item_b.setOnClickListener(new View.OnClickListener() {
+        add_item_iv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View _view) {
                 ToDoItem todo_item = new ToDoItem();
                 todo_item.m_content = new_item.getText().toString();
                 todo_item.m_is_checked = false;
                 todo_list.m_items.add(todo_item);
-                ((BaseAdapter) all_items.getAdapter()).notifyDataSetChanged();
+                refreshListView();
                 new_item.setText(Consts.EMPTY_STRING);
                 all_items.smoothScrollToPosition(todo_list.m_items.size());
             }
@@ -169,7 +170,7 @@ public class TodoListActivity extends AppCompatActivity {
                 if (charSeq.contains(Consts.NEW_LINE)) {
                     todo_list.m_items.get(current_update_index).m_content = charSeq.replace(Consts.NEW_LINE, Consts.EMPTY_STRING);
                     edittext_update.setText(Consts.EMPTY_STRING);
-                    ((BaseAdapter) all_items.getAdapter()).notifyDataSetChanged();
+                    refreshListView();
                     all_items.smoothScrollToPosition(todo_list.m_items.size());
                     if (current_update_index + 1 < todo_list.m_items.size()) {
                         current_update_index++;
@@ -191,12 +192,12 @@ public class TodoListActivity extends AppCompatActivity {
             }
         });
 
-        ok_b.setOnClickListener(new View.OnClickListener() {
+        ok_iv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View _view) {
                 todo_list.m_items.get(current_update_index).m_content = edittext_update.getText().toString();
                 setUpdateItemModeTo(false);
-                ((BaseAdapter) all_items.getAdapter()).notifyDataSetChanged();
+                refreshListView();
             }
         });
 
@@ -332,6 +333,7 @@ public class TodoListActivity extends AppCompatActivity {
 
 
     private void refreshListView() {
+        Collections.sort(todo_list.m_items, Consts.itemsComparator);
         ((BaseAdapter) all_items.getAdapter()).notifyDataSetChanged();
     }
 
@@ -396,16 +398,20 @@ public class TodoListActivity extends AppCompatActivity {
 
             final LinearLayout linear1 = (LinearLayout) view.findViewById(R.id.linear1);
             final CheckBox done_cb = (CheckBox) view.findViewById(R.id.done_cb);
-            final EditText edittext = (EditText) view.findViewById(R.id.edittext);
+            final TextView textview = (TextView) view.findViewById(R.id.textview);
             final ImageView delete_item_iv = (ImageView) view.findViewById(R.id.delete_item_iv);
 
             if (_data.get(position).m_is_checked) {
                 done_cb.setChecked(true);
+                textview.setPaintFlags(textview.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+                textview.setTextColor(0x44000000);
             } else {
                 done_cb.setChecked(false);
+                textview.setPaintFlags(textview.getPaintFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG);
+                textview.setTextColor(0xff000000);
             }
-            edittext.setText(_data.get(position).m_content);
-            edittext.setOnClickListener(new View.OnClickListener() {
+            textview.setText(_data.get(position).m_content);
+            textview.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     current_update_index = position;
@@ -431,6 +437,7 @@ public class TodoListActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
                     todo_list.m_items.get(position).m_is_checked = done_cb.isChecked();
+                    refreshListView();
                 }
             });
 

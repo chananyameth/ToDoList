@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -20,10 +21,9 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class SettingsActivity extends AppCompatActivity {
-    private String allText = Consts.EMPTY_STRING;
-
     private SeekBar lines_count_sb;
     private SeekBar character_limit_sb;
     private TextView lines_count_tv;
@@ -44,7 +44,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         Toolbar toolbar = (Toolbar) findViewById(R.id._toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
@@ -57,7 +57,7 @@ public class SettingsActivity extends AppCompatActivity {
         Button restore_b = (Button) findViewById(R.id.restore_b);
         Button delete_all_b = (Button) findViewById(R.id.delete_all_b);
         Button tutorial_b = (Button) findViewById(R.id.tutorial_b);
-        Button help_b = (Button) findViewById(R.id.help_b);
+        ImageView help_b = (ImageView) findViewById(R.id.help_iv);
         lines_count_tv = (TextView) findViewById(R.id.lines_count_tv);
         character_limit_tv = (TextView) findViewById(R.id.character_limit_tv);
         ImageView copy_iv = (ImageView) findViewById(R.id.copy_iv);
@@ -218,8 +218,8 @@ public class SettingsActivity extends AppCompatActivity {
         copy_iv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View _view) {
-                allLists_to_allText();
-                ((ClipboardManager) getSystemService(getApplicationContext().CLIPBOARD_SERVICE)).setPrimaryClip(ClipData.newPlainText("clipboard", allText));
+                allDataToString();
+                ((ClipboardManager) Objects.requireNonNull(getSystemService(Context.CLIPBOARD_SERVICE))).setPrimaryClip(ClipData.newPlainText("clipboard", allDataToString()));
                 SketchwareUtil.showMessage(getApplicationContext(), getString(R.string.copied_to_clipboard));
             }
         });
@@ -227,11 +227,11 @@ public class SettingsActivity extends AppCompatActivity {
         share_iv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View _view) {
-                allLists_to_allText();
+                allDataToString();
                 Intent share_intent = new Intent(android.content.Intent.ACTION_SEND);
                 share_intent.setType("text/plain");
                 share_intent.putExtra(android.content.Intent.EXTRA_SUBJECT, "My lists");
-                share_intent.putExtra(android.content.Intent.EXTRA_TEXT, allText);
+                share_intent.putExtra(android.content.Intent.EXTRA_TEXT, allDataToString());
                 startActivity(share_intent);
             }
         });
@@ -251,28 +251,18 @@ public class SettingsActivity extends AppCompatActivity {
         f.edit().putInt(Consts.KEY_CHARACTER_LIMIT, character_limit_sb.getProgress() * 10).apply();
     }
 
-    private void allLists_to_allText() {
+    private String allDataToString() {
         ArrayList<ToDoList> allLists = new Gson().fromJson(f.getString(Consts.KEY_ALL_LISTS, Consts.EMPTY_LIST_STRING), new TypeToken<ArrayList<ToDoList>>() {
         }.getType());
-        allText = Consts.EMPTY_STRING;
-        for (int i = 0; i < allLists.size(); i++) {
-            ToDoList single_list = allLists.get(i);
-            StringBuilder item_text = new StringBuilder(allLists.get(i).m_title + ":" + Consts.NEW_LINE);
-            for (int j = 0; j < single_list.m_items.size(); j++) {
-                if (single_list.m_items.get(j).m_is_checked) {
-                    item_text.append(Consts.V);
-                } else {
-                    item_text.append(Consts.X);
-                }
-                item_text.append(single_list.m_items.get(j).m_content).append(Consts.NEW_LINE);
-            }
-            if (item_text.length() > 0) {
-                item_text = item_text.deleteCharAt(item_text.length() - 1);
-            }
-            allText += item_text + Consts.NEW_LINE + "-----" + Consts.NEW_LINE;
+        StringBuilder allText = new StringBuilder(Consts.EMPTY_STRING);
+        String separator = Consts.NEW_LINE + "-----" + Consts.NEW_LINE;
+        for (ToDoList list : allLists) {
+            allText.append(list.toStringWithTitle()).append(separator);
         }
-        if (allText.length() > 0) {
-            allText = allText.substring(0, allText.length() - 6);
+        if (allText.length() != 0) { // there's 1 separator too many
+            return allText.substring(0, allText.length() - separator.length());
+        } else {
+            return allText.toString();
         }
     }
 }

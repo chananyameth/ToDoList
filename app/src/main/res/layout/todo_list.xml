@@ -1,7 +1,5 @@
 <LinearLayout
 	xmlns:android="http://schemas.android.com/apk/res/android"
-	xmlns:app="http://schemas.android.com/apk/res-auto"
-	xmlns:tools="http://schemas.android.com/tools"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
 	android:orientation="vertical">
@@ -21,26 +19,23 @@
 			android:scaleType="center"/>
 		<EditText
 			android:id="@+id/title"
-			android:layout_width="wrap_content"
+			android:layout_width="0dp"
 			android:layout_height="wrap_content"
 			android:background="#CFD8DC"
 			android:gravity="center_horizontal"
 			android:textSize="25sp"
 			android:textColor="#000000"
-			android:hint="Title"
+			android:hint="@string/title"
 			android:textColorHint="#607D8B"
 			android:singleLine="true"
 			android:imeOptions="actionNext"
 			android:layout_weight="1"/>
-		<Button
-			android:id="@+id/color_b"
+		<ImageView
+			android:id="@+id/palette_iv"
 			android:layout_width="45dp"
 			android:layout_height="45dp"
 			android:layout_margin="8dp"
-			android:padding="8dp"
-			android:background="@drawable/color_palette"
-			android:textSize="10sp"
-			android:textColor="#000000"/>
+			android:src="@drawable/color_palette"/>
 	</LinearLayout>
 	<LinearLayout
 		android:id="@+id/linear_all"
@@ -49,9 +44,9 @@
 		android:padding="8dp"
 		android:orientation="vertical">
 		<ListView
-			android:id="@+id/listview1"
+			android:id="@+id/items_lv"
 			android:layout_width="match_parent"
-			android:layout_height="match_parent"
+			android:layout_height="0dp"
 			android:choiceMode="none"
 			android:layout_weight="1"/>
 		<LinearLayout
@@ -63,24 +58,21 @@
 			android:orientation="horizontal">
 			<EditText
 				android:id="@+id/new_item"
-				android:layout_width="wrap_content"
+				android:layout_width="0dp"
 				android:layout_height="wrap_content"
 				android:padding="8dp"
 				android:textSize="16sp"
 				android:textColor="#000000"
-				android:hint="New item"
+				android:hint="@string/new_item"
 				android:textColorHint="#607D8B"
 				android:lines="1"
 				android:layout_weight="1"/>
-			<Button
-				android:id="@+id/add_item_b"
+			<ImageView
+				android:id="@+id/add_item_iv"
 				android:layout_width="35dp"
 				android:layout_height="35dp"
-				android:background="@drawable/ic_forward_black"
-				android:gravity="center_horizontal|center_vertical"
-				android:text="ADD"
-				android:textSize="12sp"
-				android:textColor="#000000"/>
+				android:src="@drawable/ic_forward_black"
+				android:gravity="center_horizontal|center_vertical"/>
 		</LinearLayout>
 		<LinearLayout
 			android:id="@+id/linear_update_item"
@@ -97,23 +89,21 @@
 				android:scaleType="centerInside"/>
 			<EditText
 				android:id="@+id/edittext_update"
-				android:layout_width="wrap_content"
+				android:layout_width="0dp"
 				android:layout_height="wrap_content"
 				android:padding="8dp"
 				android:textSize="16sp"
 				android:textColor="#000000"
-				android:hint="Update item"
+				android:hint="@string/update_item"
 				android:textColorHint="#607D8B"
 				android:lines="1"
 				android:layout_weight="1"/>
-			<Button
-				android:id="@+id/ok_b"
+			<ImageView
+				android:id="@+id/ok_iv"
 				android:layout_width="35dp"
 				android:layout_height="35dp"
-				android:background="@drawable/ic_check_black"
-				android:gravity="center_horizontal|center_vertical"
-				android:textSize="12sp"
-				android:textColor="#000000"/>
+				android:src="@drawable/ic_check_black"
+				android:gravity="center_horizontal|center_vertical"/>
 		</LinearLayout>
 	</LinearLayout>
 	<HorizontalScrollView

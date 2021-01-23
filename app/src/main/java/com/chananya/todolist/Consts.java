@@ -1,13 +1,16 @@
 package com.chananya.todolist;
 
+import java.util.Comparator;
 import java.util.HashMap;
 
 public class Consts {
     // General
     public static final String SharedPreferencesName = "data";
-    public static HashMap<Integer, Integer> colors = new HashMap<>();
+    public static HashMap<Integer, Integer> colors;
+    public static Comparator<ToDoItem> itemsComparator;
 
     static {
+        colors = new HashMap<>();
         colors.put(0, 0xFFFFFFFF);
         colors.put(1, 0xFFF44336);
         colors.put(2, 0xFFBA68C8);
@@ -19,6 +22,19 @@ public class Consts {
         colors.put(8, 0xFFFF9800);
         colors.put(9, 0xFFA1887F);
         colors.put(10, 0xFF78909C);
+
+        itemsComparator = new Comparator<ToDoItem>() {
+            @Override
+            public int compare(ToDoItem item1, ToDoItem item2) {
+                if (item1.m_is_checked == item2.m_is_checked) {
+                    return 0;
+                } else if (item1.m_is_checked) { // send item1 to bottom
+                    return 1;
+                } else { // send item2 to bottom
+                    return -1;
+                }
+            }
+        };
     }
 
     //Shared Preferences keys

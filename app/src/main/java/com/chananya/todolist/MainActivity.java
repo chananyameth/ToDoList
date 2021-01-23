@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.design.widget.FloatingActionButton;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 import android.widget.LinearLayout;
 import android.widget.Button;
@@ -59,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
         Button settings_b = findViewById(R.id.settings_b);
         Button about_b = findViewById(R.id.about_b);
         menuSpinner = findViewById(R.id.spinner);
-        todoLists = findViewById(R.id.listview1);
+        todoLists = findViewById(R.id.items_lv);
 
         sharedPreferences = getSharedPreferences(Consts.SharedPreferencesName, Activity.MODE_PRIVATE);
 
@@ -91,28 +92,17 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 ToDoList todo_list = all_lists.get(selectedListPosition);
-                StringBuilder list_preview = new StringBuilder(todo_list.m_title + ":" + Consts.NEW_LINE);
-                for (ToDoItem item : todo_list.m_items) {
-                    if (item.m_is_checked) {
-                        list_preview.append(Consts.V);
-                    } else {
-                        list_preview.append(Consts.X);
-                    }
-                    list_preview.append(item.m_content).append(Consts.NEW_LINE);
-                }
-                if (list_preview.length() > 0) {
-                    list_preview = list_preview.deleteCharAt(list_preview.length() - 1); // remove last new line
-                }
+                String list_preview = todo_list.toStringWithTitle();
 
                 if (selected_menu_item_position == 0) { // copy
-                    ((ClipboardManager) getSystemService(CLIPBOARD_SERVICE)).setPrimaryClip(ClipData.newPlainText("clipboard", list_preview.toString()));
+                    ((ClipboardManager) Objects.requireNonNull(getSystemService(CLIPBOARD_SERVICE))).setPrimaryClip(ClipData.newPlainText("clipboard", list_preview));
                     SketchwareUtil.showMessage(context, getString(R.string.copied_to_clipboard));
                     resetSpinner();
                 } else if (selected_menu_item_position == 1) { // share
                     Intent intent = new Intent(android.content.Intent.ACTION_SEND);
                     intent.setType("text/plain");
-                    intent.putExtra(android.content.Intent.EXTRA_SUBJECT, "My list");
-                    intent.putExtra(android.content.Intent.EXTRA_TEXT, list_preview.toString());
+                    intent.putExtra(android.content.Intent.EXTRA_SUBJECT, getString(R.string.my_list));
+                    intent.putExtra(android.content.Intent.EXTRA_TEXT, list_preview);
                     startActivity(intent);
                     resetSpinner();
                 } else if (selected_menu_item_position == 2) { // delete
@@ -226,13 +216,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private String cutAfterNLines(final String string, final int n) {
-        String nLines = Consts.EMPTY_STRING;
+        String nLines;
         if (n == 0) {
             nLines = Consts.SO_ON;
         } else {
             // find the position of the n-th new line
             int pos = string.indexOf(Consts.NEW_LINE);
-            for (int i = 0; i < n && pos != -1; i++) {
+            for (int i = 1; i < n && pos != -1; i++) {
                 pos = string.indexOf(Consts.NEW_LINE, pos + 1);
             }
 
@@ -358,25 +348,14 @@ public class MainActivity extends AppCompatActivity {
             title.setText(lists.get(position).m_title);
             ToDoList todo_list = lists.get(position);
 
-            StringBuilder listSummary = new StringBuilder(Consts.EMPTY_STRING);
-            for (ToDoItem item : todo_list.m_items) {
-                if (item.m_is_checked) {
-                    listSummary.append(Consts.V);
-                } else {
-                    listSummary.append(Consts.X);
-                }
-                listSummary.append(item.m_content).append(Consts.NEW_LINE);
-            }
-            if (listSummary.length() > 0) {
-                listSummary = listSummary.deleteCharAt(listSummary.length() - 1);
-            }
+            StringBuilder listSummary = new StringBuilder(todo_list.toString());
             if (lists.get(position).m_expanded) {
                 expand_b.setRotation(180);
             } else {
                 if (listSummary.length() > characterLimit) {
-                    listSummary = listSummary.replace(characterLimit, listSummary.length()-1, Consts.SO_ON);
+                    listSummary = listSummary.replace(characterLimit, listSummary.length(), Consts.SO_ON);
                 }
-                if (linesCount != 16) {
+                if (linesCount != 16) { // max=all lines
                     listSummary = new StringBuilder(cutAfterNLines(listSummary.toString(), linesCount));
                 }
                 expand_b.setRotation(0);

@@ -21,15 +21,14 @@
 			android:paddingBottom="8dp"
 			android:textSize="10sp"
 			android:textColor="#000000"/>
-		<EditText
-			android:id="@+id/edittext"
+		<TextView
+			android:id="@+id/textview"
 			android:focusable="false"
-			android:layout_width="wrap_content"
+			android:layout_width="0dp"
 			android:layout_height="wrap_content"
 			android:padding="8dp"
 			android:textSize="18sp"
 			android:textColor="#000000"
-			android:textColorHint="#607D8B"
 			android:layout_weight="1"/>
 		<ImageView
 			android:id="@+id/delete_item_iv"
