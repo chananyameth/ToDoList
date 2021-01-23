@@ -1,7 +1,6 @@
 <android.support.design.widget.CoordinatorLayout
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:app="http://schemas.android.com/apk/res-auto"
-	xmlns:tools="http://schemas.android.com/tools"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent">
 	<android.support.design.widget.AppBarLayout
@@ -38,7 +37,7 @@
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
 					android:padding="8dp"
-					android:text="Items in minimize mode:"
+					android:text="@string/line_to_show"
 					android:textSize="12sp"
 					android:textColor="#000000"/>
 				<TextView
@@ -68,7 +67,7 @@
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
 					android:padding="8dp"
-					android:text="Characters limit in minimize mode:"
+					android:text="@string/chars_to_show"
 					android:textSize="12sp"
 					android:textColor="#000000"/>
 				<TextView
@@ -94,7 +93,7 @@
 				android:layout_marginTop="20dp"
 				android:padding="8dp"
 				android:background="#B0BEC5"
-				android:text="restore settings to default"
+				android:text="@string/restore_to_default"
 				android:textSize="12sp"
 				android:textColor="#000000"
 				android:layout_gravity="center_horizontal"/>
@@ -116,7 +115,7 @@
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
 					android:padding="8dp"
-					android:text="&lt;-- All existing data --&gt;"
+					android:text="@string/lt_all_existing_data_gt"
 					android:textSize="12sp"
 					android:textColor="#000000"/>
 				<ImageView
@@ -133,7 +132,7 @@
 				android:layout_marginTop="20dp"
 				android:padding="8dp"
 				android:background="#B0BEC5"
-				android:text="delete all existing data"
+				android:text="@string/delete_all_existing_data"
 				android:textSize="12sp"
 				android:textColor="#000000"
 				android:layout_gravity="center_horizontal"/>
@@ -144,19 +143,16 @@
 				android:layout_marginTop="20dp"
 				android:padding="8dp"
 				android:background="#B0BEC5"
-				android:text="show tutorial on next opening"
+				android:text="@string/show_tutorial_on_next_opening"
 				android:textSize="12sp"
 				android:textColor="#000000"
 				android:layout_gravity="center_horizontal"/>
-			<Button
-				android:id="@+id/help_b"
+			<ImageView
+				android:id="@+id/help_iv"
 				android:layout_width="35dp"
 				android:layout_height="35dp"
 				android:layout_marginTop="20dp"
-				android:padding="8dp"
-				android:background="@drawable/ic_help_black"
-				android:textSize="10sp"
-				android:textColor="#000000"/>
+				android:src="@drawable/ic_help_black"/>
 		</LinearLayout>
 	</LinearLayout>
 </android.support.design.widget.CoordinatorLayout>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">רשימת משימות</string>
+    <string name="next">הבא</string>
+    <string name="close">סגור</string>
+    <string name="got_it">הבנתי!</string>
+    <string name="done">בוצע</string>
+    <string name="delete_all_title">מחק</string>
+    <string name="restore_settings_title">שחזר</string>
+    <string name="show_again">הצג גם בפעם הבאה</string>
+    <string name="no">לא</string>
+    <string name="yes">כן</string>
+    <string name="cancel">ביטול</string>
+    <string name="delete">מחק</string>
+    <string name="copy">העתק</string>
+    <string name="share">שתף</string>
+    <string name="settings">הגדרות</string>
+    <string name="ok">אוקיי</string>
+    <string name="about_title">אודות</string>
+    <string name="tutorial_4_content">תהנו!</string>
+    <string name="copied_to_clipboard">תצוגה מקדימה הועתקה ללוח!</string>
+    <string name="restore_settings_content">שחזור כל ההגדרות?</string>
+    <string name="delete_all_content">למחוק את כל המידע הקיים? פעולה זו היא בלתי הפיכה.</string>
+    <string name="delete_title">למחוק את הרשימה הזאת?</string>
+    <string name="tutorial_1_title">מדריך #1</string>
+    <string name="tutorial_2_title">מדריך #2</string>
+    <string name="tutorial_3_title">מדריך #3</string>
+    <string name="tutorial_4_title">מדריך #4</string>
+    <string name="tutorial_1_content">ברוכים הבאים ליישומון \'רשימת משימות\'! כאן תוכלו ליצור לעצמכם רשימות אישיות, כך שלא תשכחו לקנות שום דבר במכולת, או ציוד להביא לטיול. במסך הראשי מוצגות כל הרשימות במצב ממוזער. לחיצה על המשולש הקטן תרחיב כל רשימה כך שניתן יהיה לראות את כולה. במסך ההגדרות ניתן לשנות את הגדרות המזעור כרצונכם.</string>
+    <string name="tutorial_2_content">בכדי להוסיף רשימה חדשה, פשוט לחצו על הכפתור הגדול האפור בתחתית המסך. כדי לצפות ברשימה קיימת, לחצו עליה, ובכך תועברו למסך העריכה בו ניתן לשנות את צבע הרקע (פלטת הצבעים למעלה מציגה ומסתירה את תפריט הצבעים), וכמובן להוסיף פריטים חדשים לרשימה, עדכון, מחיקה, וסימון פריטים שבוצעו.</string>
+    <string name="tutorial_3_content">בהתחלה שם הרשימה יהיה בפוקוס, אך ניתן להקיש \'אנטר\' כדי לעבור לשורה בה ניתן להוסיף פריט חדש. שימו לב, כל פריט מכיל שורה אחת בלבד, אז אם תרדו שורה ייווצר פריט חדש.</string>
+    <string name="about_content">יישומון זה נוצר ע\"י Chananya © חנניה. ניתן להשתמש בו ולשתף אותו בחופשיות, אך בלי לדרוש תשלום על כך. הערות, הארות ורעיונות ניתן לשלוח למייל שלי chananya@g.jct.ac.il. שימוש מועיל!</string>
+    <string name="all">הכול</string>
+    <string name="title">כותרת</string>
+    <string name="summary">תקציר</string>
+    <string name="new_item">פריט חדש</string>
+    <string name="update_item">עדכון פריט</string>
+    <string name="line_to_show">פריטים להצגה במצב ממוזער</string>
+    <string name="chars_to_show">תווים להצגה במצב ממוזער</string>
+    <string name="restore_to_default">שחזור להגדרות ברירת המחדל</string>
+    <string name="lt_all_existing_data_gt"><![CDATA[<-- כל המידע הקיים -->]]></string>
+    <string name="delete_all_existing_data">מחיקת כל המידע הקיים</string>
+    <string name="show_tutorial_on_next_opening">הצג מדריך בפתיחה הבאה</string>
+    <string name="my_list">הרשימה שלי</string>
+</resources>
