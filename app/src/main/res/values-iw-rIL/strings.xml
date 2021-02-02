@@ -42,4 +42,13 @@
     <string name="delete_all_existing_data">מחיקת כל המידע הקיים</string>
     <string name="show_tutorial_on_next_opening">הצג מדריך בפתיחה הבאה</string>
     <string name="my_list">הרשימה שלי</string>
+    <string name="import_data">ייבוא נתונים</string>
+    <string name="export_data">ייצוא נתונים</string>
+    <string name="exported_to_clipboard">כל המידע יוצא ללוח!</string>
+    <string name="import_warning_title1">ייבוא נתונים - מחיקת המידע הקיים</string>
+    <string name="import_warning_title2">האם את/ה בטוח/ה?</string>
+    <string name="import_warning_content2">כל המידע שקיים כרגע יימחק. במקומו יוכנס המידע הבא:</string>
+    <string name="nothing_in_clipboard">הלוח ריק. העתיקו ללוח את המידע לייבוא.</string>
+    <string name="imported_successfully">המידע יובא בהצלחה!</string>
+    <string name="import_warning_content1">ייבוא מידע חדש מהלוח, ודריסת המידע הקיים.</string>
 </resources>
