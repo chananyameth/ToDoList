@@ -1,45 +1,39 @@
 package com.chananya.todolist;
 
-import android.os.*;
-import android.view.*;
-import android.content.*;
-
-import android.support.v7.app.AppCompatActivity;
+import android.app.AlertDialog;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.AppCompatActivity;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.Spinner;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Objects;
 
-import android.widget.LinearLayout;
-import android.widget.Button;
-import android.widget.TextView;
-import android.widget.Spinner;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
-import android.widget.BaseAdapter;
-import android.app.Activity;
-import android.content.SharedPreferences;
-import android.content.Intent;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.view.View;
-import android.widget.AdapterView;
-
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
-import android.content.ClipData;
-import android.content.ClipboardManager;
-
 public class MainActivity extends AppCompatActivity {
     private Context context;
-    private SharedPreferences sharedPreferences;
+    private Configuration configuration;
 
     private int characterLimit = 0;
     private int linesCount = 0;
     private int selectedListPosition = 0;
 
-    private ArrayList<ToDoList> all_lists = new ArrayList<>();
+    private ArrayList<ToDoList> all_lists = null;
     private ArrayList<String> menuSpinnerOptions = new ArrayList<>();
     private Spinner menuSpinner;
     private ListView todoLists;
@@ -55,14 +49,13 @@ public class MainActivity extends AppCompatActivity {
 
     private void initialize() {
         context = MainActivity.this;
+        configuration = Configuration.getInstance(context);
 
         FloatingActionButton floatingActionButton = findViewById(R.id.fab);
         Button settings_b = findViewById(R.id.settings_b);
         Button about_b = findViewById(R.id.about_b);
         menuSpinner = findViewById(R.id.spinner);
         todoLists = findViewById(R.id.items_lv);
-
-        sharedPreferences = getSharedPreferences(Consts.SharedPreferencesName, Activity.MODE_PRIVATE);
 
         settings_b.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -113,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface _dialog, int _which) {
                             all_lists.remove(selectedListPosition);
-                            sharedPreferences.edit().putString(Consts.KEY_ALL_LISTS, new Gson().toJson(all_lists)).apply();
+                            configuration.data.lists = all_lists; // TODO: might be redundant: all_lists already points to the config?
                             ((BaseAdapter) todoLists.getAdapter()).notifyDataSetChanged();
                             resetSpinner();
                         }
@@ -173,8 +166,8 @@ public class MainActivity extends AppCompatActivity {
         menuSpinner.setAdapter(new ArrayAdapter<>(getBaseContext(), android.R.layout.simple_spinner_dropdown_item, menuSpinnerOptions));
         menuSpinner.setGravity(Gravity.CENTER_HORIZONTAL);
         resetSpinner();
-        if (sharedPreferences.getString(Consts.KEY_TUTORIAL, Consts.EMPTY_STRING).equals(Consts.EMPTY_STRING)) {
-            sharedPreferences.edit().putString(Consts.KEY_TUTORIAL, "done").apply();
+        if (configuration.data.show_tutorial) {
+            configuration.data.show_tutorial = false;
             showTutorial();
         }
     }
@@ -193,26 +186,16 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();
-        if (sharedPreferences.getString(Consts.KEY_ALL_LISTS, Consts.EMPTY_LIST_STRING).equals(Consts.EMPTY_LIST_STRING)) {
-            sharedPreferences.edit().putString(Consts.KEY_ALL_LISTS, Consts.EMPTY_LIST_STRING).apply();
-        }
-        if (sharedPreferences.getInt(Consts.KEY_LINES_COUNT, Consts.INVALID_LINES_COUNT) == Consts.INVALID_LINES_COUNT) {
-            sharedPreferences.edit().putInt(Consts.KEY_LINES_COUNT, Consts.DEFAULT_LINES_COUNT).apply();
-        }
-        if (sharedPreferences.getInt(Consts.KEY_CHARACTER_LIMIT, Consts.INVALID_CHARACTER_LIMIT) == Consts.INVALID_CHARACTER_LIMIT) {
-            sharedPreferences.edit().putInt(Consts.KEY_CHARACTER_LIMIT, Consts.DEFAULT_CHARACTER_LIMIT).apply();
-        }
-        all_lists = new Gson().fromJson(sharedPreferences.getString(Consts.KEY_ALL_LISTS, Consts.EMPTY_LIST_STRING), new TypeToken<ArrayList<ToDoList>>() {
-        }.getType());
-        linesCount = sharedPreferences.getInt(Consts.KEY_LINES_COUNT, Consts.DEFAULT_LINES_COUNT);
-        characterLimit = sharedPreferences.getInt(Consts.KEY_CHARACTER_LIMIT, Consts.DEFAULT_CHARACTER_LIMIT);
+        all_lists = configuration.data.lists;
+        linesCount = configuration.data.lines_count;
+        characterLimit = configuration.data.character_limit;
         todoLists.setAdapter(new ToDoListsAdapter(all_lists));
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        sharedPreferences.edit().putString(Consts.KEY_ALL_LISTS, new Gson().toJson(all_lists)).commit();
+        configuration.saveConfig();
     }
 
     private String cutAfterNLines(final String string, final int n) {
@@ -272,13 +255,13 @@ public class MainActivity extends AppCompatActivity {
                                 d3.setPositiveButton(R.string.got_it, new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface _dialog, int _which) {
-                                        sharedPreferences.edit().putString(Consts.KEY_TUTORIAL, "done").apply();
+                                        configuration.data.show_tutorial = false;
                                     }
                                 });
                                 d3.setNegativeButton(R.string.show_again, new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface _dialog, int _which) {
-                                        sharedPreferences.edit().remove(Consts.KEY_TUTORIAL).apply();
+                                        configuration.data.show_tutorial = true;
                                     }
                                 });
                                 d3.create().show();

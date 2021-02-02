@@ -17,24 +17,20 @@ import android.widget.ImageView;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.BaseAdapter;
-import android.app.Activity;
-import android.content.SharedPreferences;
 import android.animation.ObjectAnimator;
 import android.view.animation.DecelerateInterpolator;
 import android.view.View;
 import android.text.Editable;
 import android.text.TextWatcher;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
 public class TodoListActivity extends AppCompatActivity {
+    private Configuration configuration;
+
     private int current_update_index = 0;
 
     private ArrayList<ToDoList> all_lists;
     private ToDoList todo_list;
 
-    private SharedPreferences f;
     private ObjectAnimator oa1 = new ObjectAnimator();
 
     private LinearLayout linear_all;
@@ -56,6 +52,8 @@ public class TodoListActivity extends AppCompatActivity {
 
 
     private void initialize() {
+        configuration = Configuration.getInstance(TodoListActivity.this);
+
         linear_all = (LinearLayout) findViewById(R.id.linear_all);
         colors_hs = (HorizontalScrollView) findViewById(R.id.colors_hs);
         ImageView back_iv = (ImageView) findViewById(R.id.back_iv);
@@ -80,8 +78,8 @@ public class TodoListActivity extends AppCompatActivity {
         ImageView imageview8 = (ImageView) findViewById(R.id.imageview8);
         ImageView imageview9 = (ImageView) findViewById(R.id.imageview9);
         ImageView imageview10 = (ImageView) findViewById(R.id.imageview10);
-
-        f = getSharedPreferences(Consts.SharedPreferencesName, Activity.MODE_PRIVATE);
+        ListView colors_linear = (ListView) findViewById(R.id.colors_lv);
+        colors_linear.setAdapter(new ColorsAdapter());
 
         back_iv.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -292,8 +290,7 @@ public class TodoListActivity extends AppCompatActivity {
 
 
     private void initializeLogic() {
-        all_lists = new Gson().fromJson(f.getString(Consts.KEY_ALL_LISTS, Consts.EMPTY_LIST_STRING), new TypeToken<ArrayList<ToDoList>>() {
-        }.getType());
+        all_lists = configuration.data.lists;
 
         current_update_index = -1;
         setUpdateItemModeTo(false);
@@ -323,7 +320,8 @@ public class TodoListActivity extends AppCompatActivity {
         } else {
             all_lists.set(getIntent().getIntExtra(Consts.ITEM_NUMBER, Consts.NO_ITEM), todo_list);
         }
-        f.edit().putString(Consts.KEY_ALL_LISTS, new Gson().toJson(all_lists)).commit();
+        configuration.data.lists = all_lists; //TODO: redundant?
+        configuration.saveConfig();
     }
 
 
@@ -438,6 +436,44 @@ public class TodoListActivity extends AppCompatActivity {
                 public void onClick(View v) {
                     todo_list.m_items.get(position).m_is_checked = done_cb.isChecked();
                     refreshListView();
+                }
+            });
+
+            return view;
+        }
+    }
+
+
+    public class ColorsAdapter extends BaseAdapter {
+        @Override
+        public int getCount() {
+            return Consts.colors_arr.size();
+        }
+
+        @Override
+        public Object getItem(int i) {
+            return Consts.colors_arr.get(i);
+        }
+
+        @Override
+        public long getItemId(int i) {
+            return i;
+        }
+
+        @Override
+        public View getView(final int position, View view, ViewGroup viewGroup) {
+            LayoutInflater _inflater = (LayoutInflater) getBaseContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            if (view == null) {
+                view = _inflater.inflate(R.layout.color_item, null);
+            }
+
+            final ImageView color_iv = (ImageView) view.findViewById(R.id.single_color);
+            color_iv.setBackgroundColor(Consts.colors_arr.get(position));
+            color_iv.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    todo_list.m_background_color = Consts.colors_arr.get(position);
+                    paintView(linear_all, todo_list.m_background_color);
                 }
             });
 

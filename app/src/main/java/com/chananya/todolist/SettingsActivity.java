@@ -1,13 +1,11 @@
 package com.chananya.todolist;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -17,19 +15,16 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
-import java.util.ArrayList;
 import java.util.Objects;
 
 public class SettingsActivity extends AppCompatActivity {
+    private Configuration configuration;
+
     private SeekBar lines_count_sb;
     private SeekBar character_limit_sb;
     private TextView lines_count_tv;
     private TextView character_limit_tv;
 
-    private SharedPreferences f;
     private AlertDialog.Builder d;
 
     @Override
@@ -41,6 +36,21 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     private void initialize() {
+        configuration = Configuration.getInstance(SettingsActivity.this);
+
+        lines_count_sb = (SeekBar) findViewById(R.id.lines_count_sb);
+        character_limit_sb = (SeekBar) findViewById(R.id.character_limit_sb);
+        Button restore_b = (Button) findViewById(R.id.restore_b);
+        Button import_b = (Button) findViewById(R.id.import_data);
+        Button export_b = (Button) findViewById(R.id.export_data);
+        Button delete_all_b = (Button) findViewById(R.id.delete_all_b);
+        Button tutorial_b = (Button) findViewById(R.id.tutorial_b);
+        ImageView help_b = (ImageView) findViewById(R.id.help_iv);
+        lines_count_tv = (TextView) findViewById(R.id.lines_count_tv);
+        character_limit_tv = (TextView) findViewById(R.id.character_limit_tv);
+        ImageView copy_iv = (ImageView) findViewById(R.id.copy_iv);
+        ImageView share_iv = (ImageView) findViewById(R.id.share_iv);
+        d = new AlertDialog.Builder(this);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id._toolbar);
         setSupportActionBar(toolbar);
@@ -52,18 +62,6 @@ public class SettingsActivity extends AppCompatActivity {
                 onBackPressed();
             }
         });
-        lines_count_sb = (SeekBar) findViewById(R.id.lines_count_sb);
-        character_limit_sb = (SeekBar) findViewById(R.id.character_limit_sb);
-        Button restore_b = (Button) findViewById(R.id.restore_b);
-        Button delete_all_b = (Button) findViewById(R.id.delete_all_b);
-        Button tutorial_b = (Button) findViewById(R.id.tutorial_b);
-        ImageView help_b = (ImageView) findViewById(R.id.help_iv);
-        lines_count_tv = (TextView) findViewById(R.id.lines_count_tv);
-        character_limit_tv = (TextView) findViewById(R.id.character_limit_tv);
-        ImageView copy_iv = (ImageView) findViewById(R.id.copy_iv);
-        ImageView share_iv = (ImageView) findViewById(R.id.share_iv);
-        f = getSharedPreferences(Consts.SharedPreferencesName, Activity.MODE_PRIVATE);
-        d = new AlertDialog.Builder(this);
 
         lines_count_sb.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -125,6 +123,50 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
 
+        import_b.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View _view) {
+                d.setTitle(R.string.import_warning_title1);
+                d.setMessage(R.string.import_warning_content1);
+                d.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface _dialog, int _which) {
+                        ClipData clip = Objects.requireNonNull(
+                                ((ClipboardManager) Objects.requireNonNull(
+                                        getSystemService(Context.CLIPBOARD_SERVICE)))
+                                        .getPrimaryClip());
+                        final String data = clip.getItemAt(0).getText().toString();
+                        if (clip.getItemCount() < 1) {
+                            SketchwareUtil.showMessage(getApplicationContext(), getString(R.string.nothing_in_clipboard));
+                            SketchwareUtil.showMessage(getApplicationContext(), getString(R.string.nothing_in_clipboard));
+                        } else {
+                            AlertDialog.Builder d1 = new AlertDialog.Builder(SettingsActivity.this);
+                            d1.setTitle(R.string.import_warning_title2);
+                            d1.setMessage(getString(R.string.import_warning_content2) + "\n\n" + data);
+                            d1.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface _dialog, int _which) {
+                                    configuration.data = Configuration.gson.fromJson(data, Configuration.Data.class);
+                                    configuration.saveConfig();
+                                    SketchwareUtil.showMessage(getApplicationContext(), getString(R.string.imported_successfully));
+                                }
+                            });
+                            d1.setNegativeButton(R.string.no, null);
+                            d1.create().show();
+                        }
+                    }
+                });
+                d.setNegativeButton(R.string.no, null);
+                d.create().show();
+            }
+        });
+        export_b.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View _view) {
+                ((ClipboardManager) Objects.requireNonNull(getSystemService(Context.CLIPBOARD_SERVICE))).setPrimaryClip(ClipData.newPlainText("clipboard", Configuration.gson.toJson(configuration.data)));
+                SketchwareUtil.showMessage(getApplicationContext(), getString(R.string.exported_to_clipboard));
+            }
+        });
         delete_all_b.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View _view) {
@@ -133,15 +175,10 @@ public class SettingsActivity extends AppCompatActivity {
                 d.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface _dialog, int _which) {
-                        f.edit().remove(Consts.KEY_ALL_LISTS).apply();
+                        configuration.data.lists.clear();
                     }
                 });
-                d.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface _dialog, int _which) {
-
-                    }
-                });
+                d.setNegativeButton(R.string.no, null);
                 d.create().show();
             }
         });
@@ -149,7 +186,7 @@ public class SettingsActivity extends AppCompatActivity {
         tutorial_b.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View _view) {
-                f.edit().remove(Consts.KEY_TUTORIAL).apply();
+                configuration.data.show_tutorial = true;
                 SketchwareUtil.showMessage(getApplicationContext(), getString(R.string.done));
             }
         });
@@ -181,7 +218,7 @@ public class SettingsActivity extends AppCompatActivity {
                                         d3.setPositiveButton(R.string.got_it, new DialogInterface.OnClickListener() {
                                             @Override
                                             public void onClick(DialogInterface _dialog, int _which) {
-                                                f.edit().putString(Consts.KEY_TUTORIAL, "done").apply();
+                                                configuration.data.show_tutorial = false;
                                             }
                                         });
                                         d3.create().show();
@@ -239,24 +276,23 @@ public class SettingsActivity extends AppCompatActivity {
 
     private void initializeLogic() {
         setTitle(getString(R.string.settings));
-        lines_count_sb.setProgress(f.getInt(Consts.KEY_LINES_COUNT, Consts.DEFAULT_LINES_COUNT));
-        character_limit_sb.setProgress(f.getInt(Consts.KEY_CHARACTER_LIMIT, Consts.DEFAULT_CHARACTER_LIMIT) / 10);
+        lines_count_sb.setProgress(configuration.data.lines_count);
+        character_limit_sb.setProgress(configuration.data.character_limit / 10);
     }
 
 
     @Override
     public void onPause() {
         super.onPause();
-        f.edit().putInt(Consts.KEY_LINES_COUNT, lines_count_sb.getProgress()).apply();
-        f.edit().putInt(Consts.KEY_CHARACTER_LIMIT, character_limit_sb.getProgress() * 10).apply();
+        configuration.data.lines_count = lines_count_sb.getProgress();
+        configuration.data.character_limit = character_limit_sb.getProgress() * 10;
+        configuration.saveConfig();
     }
 
     private String allDataToString() {
-        ArrayList<ToDoList> allLists = new Gson().fromJson(f.getString(Consts.KEY_ALL_LISTS, Consts.EMPTY_LIST_STRING), new TypeToken<ArrayList<ToDoList>>() {
-        }.getType());
         StringBuilder allText = new StringBuilder(Consts.EMPTY_STRING);
         String separator = Consts.NEW_LINE + "-----" + Consts.NEW_LINE;
-        for (ToDoList list : allLists) {
+        for (ToDoList list : configuration.data.lists) {
             allText.append(list.toStringWithTitle()).append(separator);
         }
         if (allText.length() != 0) { // there's 1 separator too many

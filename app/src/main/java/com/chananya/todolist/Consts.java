@@ -1,15 +1,31 @@
 package com.chananya.todolist;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 
 public class Consts {
     // General
-    public static final String SharedPreferencesName = "data";
+    public static final int VERSION = 2;
+    public static final String ConfigFileName = "config.json";
     public static HashMap<Integer, Integer> colors;
+    public static ArrayList<Integer> colors_arr;
     public static Comparator<ToDoItem> itemsComparator;
 
     static {
+        colors_arr = new ArrayList<>(Arrays.asList(
+                0xFFFFFFFF,
+                0xFFF44336,
+                0xFFBA68C8,
+                0xFF7986CB,
+                0xFF42A5F5,
+                0xFF4CAF50,
+                0xFFFFEE58,
+                0xFFFFCA28,
+                0xFFFF9800,
+                0xFFA1887F,
+                0xFF78909C));
         colors = new HashMap<>();
         colors.put(0, 0xFFFFFFFF);
         colors.put(1, 0xFFF44336);
@@ -37,25 +53,12 @@ public class Consts {
         };
     }
 
-    //Shared Preferences keys
-    public static final String KEY_ALL_LISTS = "all lists";
-    public static final String KEY_TUTORIAL = "tutorial";
-    public static final String KEY_LINES_COUNT = "lines count";
-    public static final String KEY_CHARACTER_LIMIT = "character limit";
-
     // ToDoList keys
     public static final String ITEM_NUMBER = "item No.";
-    public static final String KEY_TITLE = "title";
-    public static final String KEY_LIST = "list";
-    public static final String KEY_TEXT = "text";
-    public static final String KEY_DONE = "done";
-    public static final String KEY_COLOR = "color";
-    public static final String KEY_EXPAND = "expand";
 
     // Strings
     public static final String NEW_LINE = "\n";
     public static final String EMPTY_STRING = "";
-    public static final String EMPTY_LIST_STRING = "[]";
     public static final String V = "✓ ";
     public static final String X = "× ";
     public static final String SO_ON = "...";

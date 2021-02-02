@@ -125,6 +125,35 @@
 					android:src="@drawable/ic_share_black"
 					android:scaleType="fitXY"/>
 			</LinearLayout>
+			<LinearLayout
+				android:id="@+id/linear_import_export"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:layout_marginTop="20dp"
+				android:gravity="center_horizontal|center_vertical"
+				android:orientation="horizontal">
+				<Button
+					android:id="@+id/import_data"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_marginEnd="16dp"
+					android:padding="8dp"
+					android:background="#B0BEC5"
+					android:text="@string/import_data"
+					android:textSize="12sp"
+					android:textColor="#000000"
+					android:layout_gravity="center_horizontal"/>
+				<Button
+					android:id="@+id/export_data"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:padding="8dp"
+					android:background="#B0BEC5"
+					android:text="@string/export_data"
+					android:textSize="12sp"
+					android:textColor="#000000"
+					android:layout_gravity="center_horizontal"/>
+			</LinearLayout>
 			<Button
 				android:id="@+id/delete_all_b"
 				android:layout_width="wrap_content"
